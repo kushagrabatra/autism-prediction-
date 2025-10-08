@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Child ASD Screening — Tech Demo (Clean)</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg1:#eaf4ff;
+      --bg2:#eef7ff;
+      --accent:#0b63b6;
+      --accent-2:#0a4f8f;
+      --muted:#6b7280;
+      --glass:rgba(255,255,255,0.92);
+      --success:#2e7d32;
+      --warn:#ff9800;
+      --danger:#b71c1c;
+      --card-radius:14px;
+    }
+
+    html,body{height:100%;margin:0;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial;}
+    body{
+      background:linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 100%);
+      -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+      padding:28px;color:#0f1721;overflow-y:scroll;
+    }
+    .site{max-width:1180px;margin:0 auto;position:relative;}
+
+    /* animated subtle background */
+    .bg-waves{
+      position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.22;
+      background-image:
+        radial-gradient(circle at 10% 10%, rgba(10,78,160,0.03), transparent 6%),
+        radial-gradient(circle at 85% 90%, rgba(10,78,160,0.02), transparent 8%);
+      mix-blend-mode: overlay;
+    }
+
+    /* header */
+    header.app-header{display:flex;align-items:center;gap:14px;margin-bottom:20px;position:relative;z-index:2;}
+    .logo{width:70px;height:70px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#fff,#eaf6ff);box-shadow:0 10px 26px rgba(11,79,138,0.06);transition:transform .22s;}
+    .logo:hover{transform:translateY(-4px) rotate(-2deg);}
+    .title{font-size:1.2rem;font-weight:700;color:var(--accent-2);margin:0;}
+    .subtitle{color:var(--muted);margin:0;font-size:0.92rem;}
+
+    /* main card (glass) */
+    .card-app{
+      position:relative;z-index:2;
+      display:grid;grid-template-columns:1fr 460px;gap:24px;
+      background:var(--glass);border-radius:var(--card-radius);padding:20px;box-shadow:0 20px 60px rgba(9,30,66,0.07);
+    }
+    @media(max-width:980px){.card-app{grid-template-columns:1fr;}}
+
+    /* left: form */
+    .form-panel{padding:6px 8px;}
+    .section-title{font-weight:700;color:var(--accent-2);margin-bottom:8px;}
+    .a-list{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+    .a-item{min-width:92px;display:flex;flex-direction:column;border-radius:10px;padding:6px;background:linear-gradient(180deg,rgba(255,255,255,0.85),rgba(255,255,255,0.95));transition:transform .12s,box-shadow .12s;}
+    .a-item select{border-radius:8px;padding:7px;}
+    .a-item:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(11,79,138,0.06);}
+    .form-control,.form-select{border-radius:10px;transition:box-shadow .15s,transform .12s;}
+    .form-control:focus,.form-select:focus{box-shadow:0 12px 30px rgba(10,78,160,0.08);transform:translateY(-3px);outline:none;}
+
+    /* Predict button & morph spinner */
+    .btn-primary{
+      background:linear-gradient(90deg,var(--accent),var(--accent-2));
+      border:none;color:white;font-weight:800;border-radius:12px;padding:10px 18px;
+      box-shadow:0 12px 30px rgba(10,78,160,0.12);
+      display:inline-flex;align-items:center;gap:10px;transition:transform .12s,box-shadow .12s;
+    }
+    .btn-primary:hover{transform:translateY(-6px);box-shadow:0 20px 40px rgba(10,78,160,0.14);}
+    .btn-primary:active{transform:translateY(0);}
+    .btn-outline{border-radius:12px;padding:9px 12px;}
+
+    .spinner-circle{width:42px;height:42px;border-radius:50%;border:4px solid rgba(255,255,255,0.18);border-top-color:#fff;animation:spin 0.9s linear infinite;display:none;}
+    @keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+
+    /* right: visuals & result */
+    .side-panel{padding:8px 6px;display:flex;flex-direction:column;gap:12px;}
+    .hero-img{width:100%;height:190px;object-fit:cover;border-radius:12px;box-shadow:0 14px 34px rgba(9,30,66,0.06);transform:translateY(8px);opacity:0;animation:fadeInUp .8s ease forwards;}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+
+    #resultBox{padding:16px;border-radius:12px;background:linear-gradient(180deg,#fff,#f7f9ff);text-align:center;font-weight:800;transition:all .35s cubic-bezier(.2,.9,.3,1);}
+    #resultBox.good{box-shadow:0 20px 50px rgba(46,125,50,0.08);color:var(--success);}
+    #resultBox.bad{box-shadow:0 20px 50px rgba(183,28,28,0.08);color:var(--danger);}
+    #probBar{height:16px;border-radius:12px;background:#eef6ff;margin-top:12px;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,0.6);}
+    #probFill{height:100%;width:0%;transition:width 1s cubic-bezier(.2,.9,.2,1),background .4s;}
+
+    .info-card{background:linear-gradient(180deg,rgba(255,255,255,0.96),rgba(255,255,255,1));border-radius:10px;padding:10px;box-shadow:0 10px 22px rgba(9,30,66,0.03);transition:transform .18s;}
+    .info-card:hover{transform:translateY(-6px);}
+
+    .confetti{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:9999;}
+    .confetti .piece{position:absolute;width:10px;height:14px;border-radius:2px;opacity:0.95;}
+
+    .loading-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(9,30,66,0.18);z-index:9998;}
+    .loading-card{background:white;padding:16px 20px;border-radius:12px;display:flex;gap:12px;align-items:center;box-shadow:0 18px 40px rgba(9,30,66,0.18);}
+
+    @media(max-width:640px){ .card-app{padding:12px} .hero-img{height:150px} .side-panel{padding-top:6px} }
+  </style>
+</head>
+<body>
+  <div class="bg-waves" aria-hidden="true"></div>
+
+  <div class="site">
+    <header class="app-header">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" style="width:34px;height:34px;color:var(--accent)"><rect x="10" y="3" width="4" height="18" rx="1" fill="currentColor"/><rect x="3" y="10" width="18" height="4" rx="1" fill="currentColor"/></svg>
+      </div>
+      <div>
+        <p class="title">Child ASD Screening — Tech Demo</p>
+        <p class="subtitle">Sleek demo UI • Local model • Classroom use only</p>
+      </div>
+      <div style="margin-left:auto" class="muted">Open on network: <strong>172.20.10.3:8000</strong></div>
+    </header>
+
+    <main class="card-app" role="main">
+      <!-- LEFT: FORM -->
+      <section class="form-panel" aria-label="Screening form">
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+          <div class="icon" style="width:44px;height:44px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:white;box-shadow:0 10px 22px rgba(11,79,138,0.05)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v16H4z" stroke="#0b4f8a" stroke-width="1.2"/></svg>
+          </div>
+          <div>
+            <div class="section-title">Screening Form</div>
+            <div class="muted">Answer screening items and demographics; press Predict to get the model output.</div>
+          </div>
+        </div>
+
+        <div class="section-title">Screening Questions (A1–A10)</div>
+        <div class="a-list" id="a-questions" role="list"></div>
+
+        <hr />
+
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Age (months)</label>
+            <input id="age" class="form-control" type="number" value="36" min="0">
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Qchat-10 Score</label>
+            <input id="qchat" class="form-control" type="number" value="6" min="0" max="10">
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Sex</label>
+            <select id="sex" class="form-select"><option value="m">Male</option><option value="f">Female</option></select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Ethnicity</label>
+            <select id="ethnicity" class="form-select">
+              <option value="White European">White European</option>
+              <option value="Asian">Asian</option>
+              <option value="Black">Black</option>
+              <option value="Latino">Latino</option>
+              <option value="Middle Eastern">Middle Eastern</option>
+              <option value="Mixed">Mixed</option>
+              <option value="Others">Others</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Jaundice</label>
+            <select id="jaundice" class="form-select"><option value="no">No</option><option value="yes">Yes</option></select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Family member with ASD</label>
+            <select id="family" class="form-select"><option value="no">No</option><option value="yes">Yes</option></select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Who completed the test</label>
+            <select id="who" class="form-select">
+              <option value="family member">Family member</option>
+              <option value="healthcare professional">Healthcare professional</option>
+              <option value="self">Self</option>
+              <option value="others">Others</option>
+            </select>
+          </div>
+
+          <div class="col-12 d-flex gap-2 mt-2">
+            <button id="btnPredict" class="btn btn-primary" onclick="predict()">
+              <span id="btnLabel">Predict</span>
+              <span id="btnSpinner" class="spinner-circle" aria-hidden="true"></span>
+            </button>
+            <button class="btn btn-outline" onclick="downloadExample()">Download JSON</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: RESULT & IMAGES -->
+      <aside class="side-panel" aria-label="Results and visuals">
+        <!-- HERO image (user-provided #1) -->
+        <img class="hero-img" id="heroImg" src="https://images.unsplash.com/photo-1620136619922-f592abb9df44?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8YXV0aXNtJTIwYXdhcmVuZXNzfGVufDB8fDB8fHww" alt="Autism awareness art">
+
+        <div>
+          <div class="section-title">Result</div>
+          <div id="resultBox">No prediction yet</div>
+          <div id="probBar"><div id="probFill"></div></div>
+          <div id="probNote" class="muted" style="margin-top:8px">Confidence: —</div>
+        </div>
+
+        <div class="info-card">
+          <img src="https://plus.unsplash.com/premium_photo-1718201868834-7d1afd0c8028?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8YXV0aXNtJTIwYXdhcmVuZXNzfGVufDB8fDB8fHww" style="width:100%;border-radius:8px;margin-bottom:8px" alt="Autism puzzle">
+        </div>
+
+        <div class="info-card">
+          <img src="https://plus.unsplash.com/premium_photo-1715474789595-b632c37610c7?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fGF1dGlzbXxlbnwwfHwwfHx8MA%3D%3D" style="width:100%;border-radius:8px;margin-bottom:8px" alt="Puzzle design">
+        </div>
+      </aside>
+    </main>
+
+    <p class="muted" style="text-align:center;margin-top:14px;">Built with FastAPI • Local demo only</p>
+  </div>
+
+  <!-- confetti container -->
+  <div class="confetti" id="confetti"></div>
+
+  <!-- loading overlay -->
+  <div class="loading-overlay" id="loadingOverlay" aria-hidden="true">
+    <div class="loading-card">
+      <div class="spinner" style="width:44px;height:44px;border-radius:50%;border:5px solid #eef6ff;border-top-color:var(--accent);animation:spin 1s linear infinite"></div>
+      <div>
+        <div style="font-weight:700">Predicting…</div>
+        <div class="muted" style="font-size:0.92rem">Please wait</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Build A1..A10 dynamically
+    const aContainer = document.getElementById('a-questions');
+    for (let i = 1; i <= 10; i++) {
+      const div = document.createElement('div');
+      div.className = 'a-item';
+      div.innerHTML = `
+        <label class="form-label">A${i}</label>
+        <select id="A${i}" class="form-select form-select-sm" style="width:90px">
+          <option value="0">0</option>
+          <option value="1">1</option>
+        </select>
+      `;
+      aContainer.appendChild(div);
+    }
+
+    // UI refs
+    const overlay = document.getElementById('loadingOverlay');
+    const resultBox = document.getElementById('resultBox');
+    const probFill = document.getElementById('probFill');
+    const probNote = document.getElementById('probNote');
+    const confettiEl = document.getElementById('confetti');
+    const btnPredict = document.getElementById('btnPredict');
+    const btnSpinner = document.getElementById('btnSpinner');
+    const btnLabel = document.getElementById('btnLabel');
+
+    // Audio (WebAudio API, no files)
+    const audioCtx = (typeof AudioContext !== 'undefined') ? new AudioContext() : null;
+    function playTone(freq, duration=240, type='sine', vol=0.02){
+      if(!audioCtx) return;
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      g.gain.value = vol;
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start();
+      setTimeout(()=>{ o.stop(); o.disconnect(); g.disconnect(); }, duration);
+    }
+    function playSuccess(){ playTone(660,220,'sine',0.035); setTimeout(()=> playTone(880,150,'sine',0.02), 180); }
+    function playAlert(){ playTone(360,260,'sawtooth',0.03); setTimeout(()=> playTone(240,140,'sine',0.02), 200); }
+
+    // Confetti animation
+    function launchConfetti(){
+      const colors = ['#4D96FF','#9B8CFC','#6BCB77','#FFD166','#FF6B6B'];
+      for (let i=0; i<36; i++){
+        const el = document.createElement('div');
+        el.className = 'piece';
+        el.style.background = colors[i % colors.length];
+        el.style.left = (10 + Math.random()*80) + '%';
+        el.style.top = '-6%';
+        el.style.width = (6 + Math.random()*12) + 'px';
+        el.style.height = (8 + Math.random()*14) + 'px';
+        confettiEl.appendChild(el);
+        const dur = 1500 + Math.random()*1200;
+        el.animate([
+          { transform: `translateY(0px) rotate(${Math.random()*360}deg)`, opacity:1 },
+          { transform: `translateY(${380 + Math.random()*220}px) rotate(${Math.random()*720}deg)`, opacity:0.95 }
+        ], { duration: dur, easing: 'cubic-bezier(.2,.9,.2,1)'});
+        setTimeout(()=> el.remove(), dur + 80);
+      }
+    }
+
+    // Collect features from form
+    function collectFeatures(){
+      const f = {};
+      for (let i=1; i<=10; i++) f['A'+i] = Number(document.getElementById('A'+i).value);
+      f['Age_Mons'] = Number(document.getElementById('age').value || 0);
+      f['Qchat-10-Score'] = Number(document.getElementById('qchat').value || 0);
+      f['Sex'] = document.getElementById('sex').value;
+      f['Ethnicity'] = document.getElementById('ethnicity').value;
+      f['Jaundice'] = document.getElementById('jaundice').value;
+      f['Family_mem_with_ASD'] = document.getElementById('family').value;
+      f['Who completed the test'] = document.getElementById('who').value;
+      return f;
+    }
+
+    // Show / hide overlay + morph button
+    function showOverlay(){ overlay.style.display = 'flex'; overlay.setAttribute('aria-hidden','false'); btnSpinner.style.display = 'inline-flex'; if(btnLabel) btnLabel.style.visibility = 'hidden'; btnPredict.disabled = true; }
+    function hideOverlay(){ overlay.style.display = 'none'; overlay.setAttribute('aria-hidden','true'); btnSpinner.style.display = 'none'; if(btnLabel) btnLabel.style.visibility = 'visible'; btnPredict.disabled = false; }
+
+    // Set probability bar
+    function setProb(pct){
+      const clamped = Math.max(0, Math.min(100, Math.round(pct)));
+      probFill.style.width = clamped + '%';
+      probNote.textContent = 'Confidence: ' + clamped + '%';
+      if (clamped >= 70) probFill.style.background = 'linear-gradient(90deg,#ff6b6b,#d32f2f)';
+      else if (clamped >= 50) probFill.style.background = 'linear-gradient(90deg,#ffd166,#ff9800)';
+      else probFill.style.background = 'linear-gradient(90deg,#9be6a8,#2e7d32)';
+    }
+
+    // Main predict function
+    async function predict(){
+      // UI prep
+      resultBox.textContent = 'Processing…';
+      resultBox.className = '';
+      setProb(0);
+      showOverlay();
+
+      const features = collectFeatures();
+
+      try {
+        const res = await fetch('/ml/predict', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ features })
+        });
+
+        const text = await res.text(); // we no longer show raw, but keep for debugging
+        if (!res.ok) {
+          resultBox.textContent = 'Server error: ' + res.status;
+          resultBox.classList.add('bad');
+          playAlert();
+          return;
+        }
+
+        const data = JSON.parse(text);
+        const prob = Number(data.probability || 0);
+        const pred = data.prediction || 'Unknown';
+
+        resultBox.textContent = `Prediction: ${pred}`;
+        resultBox.classList.add((pred === 'Yes' || pred === 'yes') ? 'bad' : 'good');
+        setProb(prob * 100);
+
+        if (pred === 'No' || pred === 'no') {
+          playSuccess();
+          launchConfetti();
+        } else {
+          playAlert();
+        }
+      } catch (err) {
+        resultBox.textContent = 'Fetch error';
+        resultBox.classList.add('bad');
+        playAlert();
+      } finally {
+        hideOverlay();
+      }
+    }
+
+    // Download JSON of current inputs
+    function downloadExample(){
+      const blob = new Blob([JSON.stringify({ features: collectFeatures() }, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'sample_predict.json'; a.click(); a.remove();
+    }
+
+    // Init: hide spinner, small parallax on hero
+    window.addEventListener('load', () => {
+      btnSpinner.style.display = 'none';
+      // parallax hero movement
+      const hero = document.getElementById('heroImg');
+      window.addEventListener('mousemove', (e) => {
+        const x = (e.clientX / window.innerWidth - 0.5) * 8;
+        const y = (e.clientY / window.innerHeight - 0.5) * 8;
+        hero.style.transform = `translateY(${y}px) translateX(${x}px)`;
+      });
+      // warm up audio context on first user interaction to allow sound
+      function warmAudio() { if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); window.removeEventListener('pointerdown', warmAudio); }
+      window.addEventListener('pointerdown', warmAudio);
+    });
+  </script>
+</body>
+</html>

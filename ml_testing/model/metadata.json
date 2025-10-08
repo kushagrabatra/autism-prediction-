@@ -1,0 +1,66 @@
+{
+  "feature_columns": [
+    "A1",
+    "A2",
+    "A3",
+    "A4",
+    "A5",
+    "A6",
+    "A7",
+    "A8",
+    "A9",
+    "A10",
+    "Age_Mons",
+    "Qchat-10-Score",
+    "Sex",
+    "Ethnicity",
+    "Jaundice",
+    "Family_mem_with_ASD",
+    "Who completed the test"
+  ],
+  "numeric_columns": [
+    "A1",
+    "A2",
+    "A3",
+    "A4",
+    "A5",
+    "A6",
+    "A7",
+    "A8",
+    "A9",
+    "A10",
+    "Age_Mons",
+    "Qchat-10-Score"
+  ],
+  "categorical_columns": [
+    "Sex",
+    "Ethnicity",
+    "Jaundice",
+    "Family_mem_with_ASD",
+    "Who completed the test"
+  ],
+  "target_column": "Class/ASD Traits",
+  "target_classes": [
+    "No",
+    "Yes"
+  ],
+  "best_model": "RandomForest",
+  "scores": {
+    "RandomForest": {
+      "f1": 1.0,
+      "acc": 1.0
+    },
+    "SVC": {
+      "f1": 0.9952706093878423,
+      "acc": 0.995260663507109
+    },
+    "DecisionTree": {
+      "f1": 1.0,
+      "acc": 1.0
+    },
+    "GaussianNB": {
+      "f1": 0.7434334129283281,
+      "acc": 0.7345971563981043
+    }
+  }
+}
