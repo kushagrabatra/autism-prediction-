@@ -41,7 +41,15 @@ API_HOST: str = os.getenv("API_HOST", "127.0.0.1")
 API_PORT: int = int(os.getenv("API_PORT", "8000"))
 DEBUG: bool = os.getenv("DEBUG", "false").lower() in ("1", "true", "yes")
 
+def _parse_allowed_origins(value: str) -> list[str]:
+    value = value.strip()
+    if value == "*":
+        return ["*"]
+    return [origin.strip() for origin in value.split(",") if origin.strip()]
+
 # ---------------------------------------------------------------------------
 # CORS settings
 # ---------------------------------------------------------------------------
-ALLOWED_ORIGINS: list[str] = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+ALLOWED_ORIGINS: list[str] = _parse_allowed_origins(
+    os.getenv("ALLOWED_ORIGINS", "*")
+)
