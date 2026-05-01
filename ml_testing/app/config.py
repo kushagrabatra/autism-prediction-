@@ -1,6 +1,6 @@
 """Centralized configuration for the Autism Prediction API.
 
-Settings can be overridden via environment variables or a .env file.
+Settings can be overridden via environment variables.
 """
 
 import os
