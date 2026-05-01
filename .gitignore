@@ -136,7 +136,15 @@ dmypy.json
 *.joblib
 *.model
 *.h5
+*.pth
+*.zip
 
 # Local development
 .local/
 *.bak
+
+# Environment variables
+.env
+
+# Docker
+.dockerignore

@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ml_testing/model:/app/ml_testing/model
+    environment:
+      - APP_ENV=development
+    restart: unless-stopped
