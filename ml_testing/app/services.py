@@ -7,7 +7,6 @@ cached in module-level globals so that subsequent requests are fast.
 
 import logging
 import pickle
-from pathlib import Path
 from typing import Any, Optional
 
 import pandas as pd
