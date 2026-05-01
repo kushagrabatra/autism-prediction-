@@ -5,7 +5,6 @@ These tests mock the model artifacts so they can run without actual .pkl files.
 
 import json
 import pickle
-import tempfile
 from pathlib import Path
 from typing import Any
 from unittest.mock import MagicMock, patch
